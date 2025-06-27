@@ -201,6 +201,7 @@ Connect to WebSocket at `/ws/{user_id}` for real-time features:
 ```
 
 ## Usage
+![image](https://github.com/user-attachments/assets/5a13e64c-a1e9-4698-a637-1244b02df19f)
 
 ### Getting Started
 

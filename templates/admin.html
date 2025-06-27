@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebChat Admin Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/admin.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="admin-logo">
+                <h2><i class="fas fa-shield-alt"></i> Admin Panel</h2>
+            </div>
+            <ul class="admin-nav">
+                <li><a href="#dashboard" class="nav-link active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a></li>
+                <li><a href="#users" class="nav-link" data-section="users">
+                    <i class="fas fa-users"></i> User Management
+                </a></li>
+                <li><a href="#groups" class="nav-link" data-section="groups">
+                    <i class="fas fa-layer-group"></i> Group Management
+                </a></li>
+                <li><a href="#moderation" class="nav-link" data-section="moderation">
+                    <i class="fas fa-eye"></i> Chat Moderation
+                </a></li>
+                <li><a href="#calls" class="nav-link" data-section="calls">
+                    <i class="fas fa-phone"></i> Call Logs
+                </a></li>
+                <li><a href="#settings" class="nav-link" data-section="settings">
+                    <i class="fas fa-cog"></i> Settings
+                </a></li>
+                <li><a href="#logs" class="nav-link" data-section="logs">
+                    <i class="fas fa-clipboard-list"></i> Moderation Logs
+                </a></li>
+            </ul>
+            <div class="admin-logout">
+                <button id="logout-btn" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="admin-user">
+                    <i class="fas fa-user-shield"></i>
+                    <span id="admin-username">Admin</span>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="admin-section active">
+                <div class="section-header">
+                    <h2>Dashboard Overview</h2>
+                    <button id="refresh-dashboard-btn" class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="total-users">0</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="active-users">0</h3>
+                            <p>Active Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-circle text-success"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="online-users">0</h3>
+                            <p>Online Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="total-messages">0</h3>
+                            <p>Total Messages</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="total-groups">0</h3>
+                            <p>Total Groups</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="total-calls">0</h3>
+                            <p>Total Calls</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <div class="activity-card">
+                        <h3>Recent Users</h3>
+                        <div id="recent-users" class="activity-list"></div>
+                    </div>
+                    <div class="activity-card">
+                        <h3>Recent Messages</h3>
+                        <div id="recent-messages" class="activity-list"></div>
+                    </div>
+                    <div class="activity-card">
+                        <h3>System Status</h3>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <strong>Admin Panel:</strong> <span class="status-badge status-active">Active</span>
+                            </div>
+                            <div class="activity-item">
+                                <strong>Database:</strong> <span class="status-badge status-active">Connected</span>
+                            </div>
+                            <div class="activity-item">
+                                <strong>WebSocket:</strong> <span class="status-badge status-active">Running</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="users-section" class="admin-section">
+                <div class="section-header">
+                    <h2>User Management</h2>
+                    <button id="add-user-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add User
+                    </button>
+                </div>
+                
+                <div class="search-bar">
+                    <input type="text" id="user-search" placeholder="Search users...">
+                    <button id="search-users-btn" class="btn btn-secondary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table id="users-table" class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Can Create Chats</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Groups Section -->
+            <section id="groups-section" class="admin-section">
+                <div class="section-header">
+                    <h2>Group Management</h2>
+                    <button id="add-group-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Group
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table id="groups-table" class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Creator</th>
+                                <th>Members</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Moderation Section -->
+            <section id="moderation-section" class="admin-section">
+                <div class="section-header">
+                    <h2>Chat Moderation</h2>
+                    <div class="moderation-filters">
+                        <select id="moderation-user-filter">
+                            <option value="">All Users</option>
+                        </select>
+                        <select id="moderation-group-filter">
+                            <option value="">All Groups</option>
+                        </select>
+                        <button id="load-messages-btn" class="btn btn-secondary">
+                            <i class="fas fa-eye"></i> Load Messages
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="messages-table" class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Sender</th>
+                                <th>Content</th>
+                                <th>Type</th>
+                                <th>Chat</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Call Logs Section -->
+            <section id="calls-section" class="admin-section">
+                <div class="section-header">
+                    <h2>Call Logs</h2>
+                    <div class="call-filters">
+                        <select id="call-user-filter">
+                            <option value="">All Users</option>
+                        </select>
+                        <button id="load-calls-btn" class="btn btn-secondary">
+                            <i class="fas fa-phone"></i> Load Calls
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="calls-table" class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Caller</th>
+                                <th>Receiver</th>
+                                <th>Status</th>
+                                <th>Duration</th>
+                                <th>Started</th>
+                                <th>Ended</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="admin-section">
+                <div class="section-header">
+                    <h2>System Settings</h2>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>Chat Permissions</h3>
+                        <div class="setting-item">
+                            <label for="allow-user-chats">Allow users to create chats</label>
+                            <input type="checkbox" id="allow-user-chats" class="setting-toggle">
+                        </div>
+                        <div class="setting-item">
+                            <label for="allow-group-creation">Allow users to create groups</label>
+                            <input type="checkbox" id="allow-group-creation" class="setting-toggle">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Moderation Logs Section -->
+            <section id="logs-section" class="admin-section">
+                <div class="section-header">
+                    <h2>Moderation Logs</h2>
+                </div>
+
+                <div class="table-container">
+                    <table id="logs-table" class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Admin</th>
+                                <th>Action</th>
+                                <th>Target</th>
+                                <th>Reason</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="user-modal-title">Add User</h2>
+            <form id="user-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="is-active" name="is_active" checked>
+                        Active
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="can-create-chats" name="can_create_chats" checked>
+                        Can Create Chats
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('user-modal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Group Modal -->
+    <div id="group-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="group-modal-title">Create Group</h2>
+            <form id="group-form">
+                <div class="form-group">
+                    <label for="group-name">Group Name</label>
+                    <input type="text" id="group-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="group-description">Description</label>
+                    <textarea id="group-description" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="group-creator">Creator (User ID)</label>
+                    <input type="number" id="group-creator" name="created_by" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Create Group</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('group-modal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', path='js/admin.js') }}"></script>
+</body>
+</html>
